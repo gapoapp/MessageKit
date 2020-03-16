@@ -32,7 +32,7 @@ final internal class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         window = UIWindow(frame: UIScreen.main.bounds)
-        window?.rootViewController = NavigationController(rootViewController: BasicExampleViewController())
+        window?.rootViewController = NavigationController(rootViewController: LaunchViewController())
         window?.makeKeyAndVisible()
         
         if UserDefaults.isFirstLaunch() {

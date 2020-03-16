@@ -63,41 +63,47 @@ extension BasicExampleViewController: MessagesDisplayDelegate {
     
     func messageStyle(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> MessageStyle {
         
-        var corners: UIRectCorner = []
-        
-        if isFromCurrentSender(message: message) {
-            corners.formUnion(.topLeft)
-            corners.formUnion(.bottomLeft)
-            if !isPreviousMessageSameSender(at: indexPath.section) {
-                corners.formUnion(.topRight)
-            }
-            if !isNextMessageSameSender(at: indexPath.section) {
-                corners.formUnion(.bottomRight)
-            }
-        } else {
-            corners.formUnion(.topRight)
-            corners.formUnion(.bottomRight)
-            if !isPreviousMessageSameSender(at: indexPath.section) {
-                corners.formUnion(.topLeft)
-            }
-            if !isNextMessageSameSender(at: indexPath.section) {
-                corners.formUnion(.bottomLeft)
-            }
-        }
-        
-        return .custom { view in
-            let radius: CGFloat = 16
-            let path = UIBezierPath(roundedRect: view.bounds, byRoundingCorners: corners, cornerRadii: CGSize(width: radius, height: radius))
-            let mask = CAShapeLayer()
-            mask.path = path.cgPath
-            view.layer.mask = mask
-        }
+        let tail: MessageStyle.TailCorner = isFromCurrentSender(message: message) ? .bottomRight : .bottomLeft
+        return .bubbleTail(tail, .curved)
     }
     
     func configureAvatarView(_ avatarView: AvatarView, for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) {
         let avatar = SampleData.shared.getAvatarFor(sender: message.sender)
-        avatarView.isHidden = isNextMessageSameSender(at: indexPath.section)
         avatarView.set(avatar: avatar)
+    }
+    
+    // MARK: - Location Messages
+    
+    func annotationViewForLocation(message: MessageType, at indexPath: IndexPath, in messageCollectionView: MessagesCollectionView) -> MKAnnotationView? {
+        let annotationView = MKAnnotationView(annotation: nil, reuseIdentifier: nil)
+        let pinImage = #imageLiteral(resourceName: "ic_map_marker")
+        annotationView.image = pinImage
+        annotationView.centerOffset = CGPoint(x: 0, y: -pinImage.size.height / 2)
+        return annotationView
+    }
+    
+    func animationBlockForLocation(message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> ((UIImageView) -> Void)? {
+        return { view in
+            view.layer.transform = CATransform3DMakeScale(2, 2, 2)
+            UIView.animate(withDuration: 0.6, delay: 0, usingSpringWithDamping: 0.9, initialSpringVelocity: 0, options: [], animations: {
+                view.layer.transform = CATransform3DIdentity
+            }, completion: nil)
+        }
+    }
+    
+    func snapshotOptionsForLocation(message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> LocationMessageSnapshotOptions {
+        
+        return LocationMessageSnapshotOptions(showsBuildings: true, showsPointsOfInterest: true, span: MKCoordinateSpan(latitudeDelta: 10, longitudeDelta: 10))
+    }
+
+    // MARK: - Audio Messages
+
+    func audioTintColor(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UIColor {
+        return isFromCurrentSender(message: message) ? .white : UIColor(red: 15/255, green: 135/255, blue: 255/255, alpha: 1.0)
+    }
+    
+    func configureAudioCell(_ cell: AudioMessageCell, message: MessageType) {
+        audioController.configureAudioCell(cell, message: message) // this is needed especily when the cell is reconfigure while is playing sound
     }
 
 }
@@ -106,37 +112,20 @@ extension BasicExampleViewController: MessagesDisplayDelegate {
 
 extension BasicExampleViewController: MessagesLayoutDelegate {
     
-//    func headerViewSize(for section: Int, in messagesCollectionView: MessagesCollectionView) -> CGSize {
-//        if isPreviousMessageSameSender(at: section) {
-//            return CGSize.zero
-//        } else {
-//            return CGSize(width: messagesCollectionView.bounds.width, height: 12)
-//        }
-//    }
-//    
     func cellTopLabelHeight(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGFloat {
-        return 0
+        return 18
     }
     
     func cellBottomLabelHeight(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGFloat {
-        return 0
+        return 17
     }
     
     func messageTopLabelHeight(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGFloat {
-        return 0
+        return 20
     }
     
     func messageBottomLabelHeight(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGFloat {
-        return 0
+        return 16
     }
     
-    func isPreviousMessageSameSender(at section: Int) -> Bool {
-        guard section - 1 >= 0 else { return false }
-        return messageList[section].user == messageList[section - 1].user
-    }
-    
-    func isNextMessageSameSender(at section: Int) -> Bool {
-        guard section + 1 < messageList.count else { return false }
-        return messageList[section].user == messageList[section + 1].user
-    }
 }
