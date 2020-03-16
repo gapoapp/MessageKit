@@ -31,7 +31,6 @@ open class MessagesViewController: UIViewController,
 UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
 
     /// The `MessagesCollectionView` managed by the messages view controller object.
-    open var reversed: Bool = false
     open var messagesCollectionView = MessagesCollectionView()
 
     /// The `InputBarAccessoryView` used as the `inputAccessoryView` in the view controller.
@@ -159,9 +158,7 @@ UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
         messagesCollectionView.keyboardDismissMode = .interactive
         messagesCollectionView.alwaysBounceVertical = true
         messagesCollectionView.backgroundColor = .backgroundColor
-        if reverse == true {
-            messagesCollectionView.transform = CGAffineTransform(rotationAngle: (-.pi))
-        }
+        messagesCollectionView.transform = CGAffineTransform(rotationAngle: (-.pi))
     }
 
     private func setupDelegates() {
@@ -290,43 +287,31 @@ UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
         case .text, .attributedText, .emoji:
             let cell = messagesCollectionView.dequeueReusableCell(TextMessageCell.self, for: indexPath)
             cell.configure(with: message, at: indexPath, and: messagesCollectionView)
-            if reverse == true {
-                cell.transform = CGAffineTransform(rotationAngle: (-.pi))
-            }
+            cell.transform = CGAffineTransform(rotationAngle: (-.pi))
             return cell
         case .photo, .video:
             let cell = messagesCollectionView.dequeueReusableCell(MediaMessageCell.self, for: indexPath)
             cell.configure(with: message, at: indexPath, and: messagesCollectionView)
-            if reverse == true {
-                cell.transform = CGAffineTransform(rotationAngle: (-.pi))
-            }
+            cell.transform = CGAffineTransform(rotationAngle: (-.pi))
             return cell
         case .location:
             let cell = messagesCollectionView.dequeueReusableCell(LocationMessageCell.self, for: indexPath)
             cell.configure(with: message, at: indexPath, and: messagesCollectionView)
-            if reverse == true {
-                cell.transform = CGAffineTransform(rotationAngle: (-.pi))
-            }
+            cell.transform = CGAffineTransform(rotationAngle: (-.pi))
             return cell
         case .audio:
             let cell = messagesCollectionView.dequeueReusableCell(AudioMessageCell.self, for: indexPath)
             cell.configure(with: message, at: indexPath, and: messagesCollectionView)
-            if reverse == true {
-                cell.transform = CGAffineTransform(rotationAngle: (-.pi))
-            }
+            cell.transform = CGAffineTransform(rotationAngle: (-.pi))
             return cell
         case .contact:
             let cell = messagesCollectionView.dequeueReusableCell(ContactMessageCell.self, for: indexPath)
             cell.configure(with: message, at: indexPath, and: messagesCollectionView)
-            if reverse == true {
-                cell.transform = CGAffineTransform(rotationAngle: (-.pi))
-            }
+            cell.transform = CGAffineTransform(rotationAngle: (-.pi))
             return cell
         case .custom:
             let cell =  messagesDataSource.customCell(for: message, at: indexPath, in: messagesCollectionView)
-            if reverse == true {
-                cell.transform = CGAffineTransform(rotationAngle: (-.pi))
-            }
+            cell.transform = CGAffineTransform(rotationAngle: (-.pi))
             return cell
         }
     }
